@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网页链接示例</title>
+    <style>
+        /* 确保 body 占满整个视口 */
+        #root {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+        }
+
+        /* 设置输入框样式 */
+        #urlInput {
+            width: calc(100% - 20px); /* 输入框自适应宽度 */
+            margin-right: 10px; /* 输入框和按钮之间的间距 */
+        }
+
+        /* 设置按钮样式 */
+        #confirmButton {
+            margin-top: 20px;
+            padding: 10px 20px; /* 按钮的内边距 */
+            cursor: pointer; /* 鼠标移入时显示手型 */
+        }
+    </style>
+</head>
+<body>
+
+<h1>文章自动化</h1>
+<div id="root">
+<!-- 输入链接的输入框 -->
+<input type="text" id="urlInput" placeholder="输入链接">
+
+<!-- 确认按钮 -->
+<button id="confirmButton" onclick="openLink()">确认</button>
+</div>
+
+
+<!-- 显示链接的 iframe -->
+<iframe id="linkFrame" style="display: none;"></iframe>
+
+<script>
+function openLink() {
+    // 获取输入框中的链接
+    var url = document.getElementById("urlInput").value;
+    
+    // 设置 iframe 的 src 属性为输入的链接
+    this.targetWindow = window.open(url, '_blank', 'left=100,top=100,width=400,height=400')
+
+}
+</script>
+
+</body>
+</html>
