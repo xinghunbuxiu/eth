@@ -289,13 +289,13 @@
       // 将私钥从十六进制格式转为 Buffer
       const privateKeyArray = hexToUint8Array(privateKeyHex);
 
-      // 使用私钥生成密钥对
-      const keyPair = Bitcoin.ECPair.fromPrivateKey(privateKeyBuffer);
+        // 使用 ECPair 生成密钥对
+        var keyPair = new Bitcoin.ECKey(privateKeyBytes);
 
-      // 生成 P2PKH 地址 (普通比特币地址，以 '1' 开头)
-      const { address } = Bitcoin.payments.p2pkh({ pubkey: keyPair.publicKey });
+        // 获取比特币地址
+        var btcAddress = keyPair.getBitcoinAddress().toString();
 
-      return address;
+      return btcAddress;
     }
     function generateRandomPrivateKeyAndAddress() {
       const randomPrivateKey =
