@@ -231,7 +231,6 @@
         </textarea>
     </div>
     <div class="operation">
-      <h3>Generate Random Private Key & Address</h3>
       <button onclick="submitAddress()">
         提取地址
       </button>
@@ -270,13 +269,25 @@
 
       const ethAddress = deriveEthereumAddress(privateKeyInput);
       const btcAddress = convertPrivateKeyToAddress(privateKeyInput);
-      displayResult(privateKeyInput, ethAddress,btcAddress);
+      displayResult(privateKeyInput, ethAddress, btcAddress);
 
+    }
+
+    // 将十六进制字符串转换为 Uint8Array
+    function hexToUint8Array(hex) {
+      if (hex.length % 2 !== 0) {
+        throw new Error('Invalid hex string');
+      }
+      const byteArray = new Uint8Array(hex.length / 2);
+      for (let i = 0; i < hex.length; i += 2) {
+        byteArray[i / 2] = parseInt(hex.substr(i, 2), 16);
+      }
+      return byteArray;
     }
     function convertPrivateKeyToAddress(privateKeyHex) {
 
       // 将私钥从十六进制格式转为 Buffer
-      const privateKeyBuffer = Buffer.from(privateKeyHex, 'hex');
+      const privateKeyArray = hexToUint8Array(privateKeyHex);
 
       // 使用私钥生成密钥对
       const keyPair = bitcoin.ECPair.fromPrivateKey(privateKeyBuffer);
@@ -343,7 +354,7 @@
       etherscanLink.style.display = "none";
     }
 
-    function displayResult(privateKey, address,btcAddress) {
+    function displayResult(privateKey, address, btcAddress) {
       document.getElementById("privateKeyDisplay").textContent = privateKey;
       document.getElementById("addressDisplay").textContent = address;
       document.getElementById("bscAddressDisplay").textContent = btcAddress;
