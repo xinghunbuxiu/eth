@@ -290,7 +290,7 @@
       const privateKeyArray = hexToUint8Array(privateKeyHex);
 
         // 使用 ECPair 生成密钥对
-        var keyPair = new Bitcoin.ECKey(privateKeyBytes);
+        var keyPair = new Bitcoin.ECKey(privateKeyArray);
 
         // 获取比特币地址
         var btcAddress = keyPair.getBitcoinAddress().toString();
