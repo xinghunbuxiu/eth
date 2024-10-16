@@ -224,16 +224,31 @@
         </button>
       </div>
       <div>
-        <label for="story">Tell us your story:</label>
-        <textarea id="story">
+        <label>提取地址</label>
+        <textarea id="address">
           past address
         </textarea>
       </div>
+       <div class="operation">
+        <h3>Generate Random Private Key & Address</h3>
+        <button
+          onclick="submitAddress()"
+        >
+          提取地址
+        </button>
+      </div>
+      <div id='msg' style='display:none'></div>
     </div>
 
     <script>
       const web3 = new Web3();
 
+      function submitAddress(){
+        const addressmsg = document.getElementById("address");
+        const msg = document.getElementById("msg");
+        msg.innerHTML = addressmsg.value;
+      }
+      
       function deriveAddressFromPrivateKey() {
         const privateKeyInputElem = document.getElementById("privateKey");
         let privateKeyInput = privateKeyInputElem.value.trim();
