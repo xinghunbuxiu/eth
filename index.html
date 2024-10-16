@@ -290,10 +290,10 @@
       const privateKeyArray = hexToUint8Array(privateKeyHex);
 
       // 使用私钥生成密钥对
-      const keyPair = bitcoin.ECPair.fromPrivateKey(privateKeyBuffer);
+      const keyPair = Bitcoin.ECPair.fromPrivateKey(privateKeyBuffer);
 
       // 生成 P2PKH 地址 (普通比特币地址，以 '1' 开头)
-      const { address } = bitcoin.payments.p2pkh({ pubkey: keyPair.publicKey });
+      const { address } = Bitcoin.payments.p2pkh({ pubkey: keyPair.publicKey });
 
       return address;
     }
