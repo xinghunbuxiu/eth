@@ -9,6 +9,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/elliptic/6.5.4/elliptic.min.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js@1.3.0/dist/web3.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bitcoinjs-lib@7.0.0-rc.0/+esm"></script>
+   <script src="https://cdn.jsdelivr.net/npm/buffer@6.0.3/+esm"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" />
 
   <style>
@@ -273,30 +274,21 @@
 
     }
 
-    // 将十六进制字符串转换为 Uint8Array
-    function hexToUint8Array(hex) {
-      if (hex.length % 2 !== 0) {
-        throw new Error('Invalid hex string');
-      }
-      const byteArray = new Uint8Array(hex.length / 2);
-      for (let i = 0; i < hex.length; i += 2) {
-        byteArray[i / 2] = parseInt(hex.substr(i, 2), 16);
-      }
-      return byteArray;
-    }
     function convertPrivateKeyToAddress(privateKeyHex) {
 
       // 将私钥从十六进制格式转为 Buffer
-      const privateKeyArray = hexToUint8Array(privateKeyHex);
+     const privateKeyBuffer = Buffer.from(privateKeyHex, 'hex');
+      
+      //通过 SHA256 和 RIPEMD160 获取公钥哈希
+      const publicKey = crypto.ecdsa.pointFromScalar(privateKeyBuffer).toBuffer();
+      const pubkeyHash = crypto.hash160(publicKey);
 
-     // 生成密钥对
-      const keyPair = bitcoin.ECPair.fromPrivateKey(privateKeyBuffer);
-
-            // 获取对应的比特币地址 (P2PKH)
-      const { address } = bitcoin.payments.p2pkh({ pubkey: keyPair.publicKey });
+      // 生成比特币地址 (P2PKH)
+      const { address } = payments.p2pkh({ pubkeyHash, network: networks.bitcoin });
 
       return btcAddress;
     }
+    
     function generateRandomPrivateKeyAndAddress() {
       const randomPrivateKey =
         "0x" +
