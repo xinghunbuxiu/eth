@@ -8,8 +8,7 @@
   <title>Generate Ethereum Address</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/elliptic/6.5.4/elliptic.min.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js@1.3.0/dist/web3.min.js"></script>
-  <script src="https://cdn.skypack.dev/bitcoinjs-lib@5.2.0"></script>
-  <script src="https://cdn.jsdelivr.net/npm/buffer@6.0.3/index.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bitcoinjs-lib@6.1.5/src/index.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" />
 
   <style>
@@ -280,26 +279,20 @@
       }
       return bytes;
     }
-    
+
     function convertPrivateKeyToAddress(privateKeyHex) {
 
       // 将私钥从十六进制格式转为 Buffer
       const privateKeyBuffer = hexToBytes(privateKeyHex);
 
-      // Perform RIPEMD-160 hashing on the SHA-256 hash
-      const ripemd160Hash = bitcoin.crypto.ripemd160(sha256Buffer);
+      // Step 1: Use elliptic to get the public key from the private key
+      const EC = elliptic.ec;
+      const ec = new EC('secp256k1');
+      const keyPair = ec.keyFromPrivate(privateKeyHex, 'hex');
+      const publicKey = keyPair.getPublic(true, 'hex');  // Compressed public key format
 
-      // Add version byte (0x00 for Bitcoin mainnet)
-      const versionAndHash = new Uint8Array([0x00, ...ripemd160Hash]);
-
-      // Perform double SHA-256 hash
-      const checksum = bitcoin.crypto.hash256(versionAndHash).slice(0, 4);
-
-      // Append the checksum to the version and hash
-      const addressBuffer = new Uint8Array([...versionAndHash, ...checksum]);
-
-      // Convert the result to a Base58 string
-      const btcAddress = bitcoin.address.toBase58Check(ripemd160Hash, 0x00);
+      // Step 2: Generate the Bitcoin address from the public key
+      const btcAddress = bitcoinAddress.generate(publicKey);
       return btcAddress;
     }
 
