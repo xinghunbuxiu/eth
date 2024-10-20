@@ -8,7 +8,7 @@
   <title>Generate Ethereum Address</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/elliptic/6.5.4/elliptic.min.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js@1.3.0/dist/web3.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bitcoinjs-lib@6.1.5/src/index.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" />
 
   <style>
@@ -291,11 +291,42 @@
       const keyPair = ec.keyFromPrivate(privateKeyHex, 'hex');
       const publicKey = keyPair.getPublic(true, 'hex');  // Compressed public key format
 
-      // Step 2: Generate the Bitcoin address from the public key
-      const btcAddress = bitcoinAddress.generate(publicKey);
+      // Step 2: Hash the public key using SHA256 and then RIPEMD160
+      const sha256Hash = CryptoJS.SHA256(CryptoJS.enc.Hex.parse(publicKey)).toString();
+      const ripemd160Hash = CryptoJS.RIPEMD160(CryptoJS.enc.Hex.parse(sha256Hash)).toString();
+
+      // Step 3: Add network byte (0x00 for mainnet)
+      const networkByte = '00' + ripemd160Hash;
+
+      // Step 4: Perform SHA256 hash twice on the network byte
+      const checksum = CryptoJS.SHA256(CryptoJS.enc.Hex.parse(networkByte));
+      const checksumHex = CryptoJS.SHA256(CryptoJS.enc.Hex.parse(checksum.toString())).toString().substr(0, 8);
+
+      // Step 5: Concatenate network byte and checksum
+      const finalAddressHex = networkByte + checksumHex;
+
+      // Step 6: Convert to Base58
+      const btcAddress = base58Encode(finalAddressHex);
       return btcAddress;
     }
+    function base58Encode(hex) {
+      const alphabet = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+      let num = BigInt('0x' + hex);
+      let result = '';
 
+      while (num > 0) {
+        const remainder = num % 58n;
+        num = num / 58n;
+        result = alphabet[Number(remainder)] + result;
+      }
+
+      // Handle leading zero bytes
+      for (let i = 0; i < hex.length / 2 && hex[i * 2] === '0'; i++) {
+        result = alphabet[0] + result; // '1'
+      }
+
+      return result;
+    }
     function generateRandomPrivateKeyAndAddress() {
       const randomPrivateKey =
         "0x" +
